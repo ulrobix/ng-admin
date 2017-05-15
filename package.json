@@ -1,12 +1,12 @@
 {
   "name": "ng-admin",
-  "version": "1.0.5",
+  "version": "2.0.7",
   "license": "MIT",
-  "private": false,
+  "private": true,
   "main": "lib/javascripts/ng-admin.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/marmelab/ng-admin.git"
+    "url": "ssh://git@codebase.drivecred.com:7999/hbk/ng-admin.git"
   },
   "files": [
     "*.md",
@@ -15,7 +15,7 @@
     "src/"
   ],
   "dependencies": {
-    "admin-config": "~0.12.2",
+    "ng-admin-config": "ssh://git@codebase.drivecred.com:7999/hbk/ng-admin-config.git#v2.12.3",
     "angular": "~1.6.1",
     "angular-numeraljs": "^1.1.6",
     "angular-sanitize": "^1.3.15",
