@@ -1,5 +1,5 @@
-import DataStore  from 'admin-config/lib/DataStore/DataStore';
-import Entry  from 'admin-config/lib/Entry';
+import DataStore  from 'ng-admin-config/src/DataStore/DataStore';
+import Entry  from 'ng-admin-config/src/Entry';
 import batchDeleteTemplate  from './delete/batchDelete.html';
 import deleteTemplate  from './delete/delete.html';
 import createTemplate  from './form/create.html';

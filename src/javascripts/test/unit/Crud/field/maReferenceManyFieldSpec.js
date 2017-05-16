@@ -1,10 +1,10 @@
 describe('ReferenceManyField', function() {
     var referenceManyFieldDirective = require('../../../../ng-admin/Crud/field/maReferenceManyField');
     var choicesFieldDirective = require('../../../../ng-admin/Crud/field/maChoicesField');
-    var ReferenceManyField = require('admin-config/lib/Field/ReferenceManyField');
+    var ReferenceManyField = require('ng-admin-config/src/Field/ReferenceManyField');
     var mixins = require('../../../mock/mixins');
-    var DataStore = require('admin-config/lib/DataStore/DataStore');
-    var Entry = require('admin-config/lib/Entry');
+    var DataStore = require('ng-admin-config/src/DataStore/DataStore');
+    var Entry = require('ng-admin-config/src/Entry');
 
     var $compile, $timeout, scope;
     const directiveUsage = '<ma-reference-many-field entry="entry" field="field" value="value" datastore="datastore"></ma-reference-many-field>';

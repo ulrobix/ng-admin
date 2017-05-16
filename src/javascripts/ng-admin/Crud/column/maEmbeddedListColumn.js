@@ -1,4 +1,4 @@
-import Entry from 'admin-config/lib/Entry';
+import Entry from 'ng-admin-config/src/Entry';
 
 function sorter(sortField, sortDir) {
     return (entry1, entry2) => {

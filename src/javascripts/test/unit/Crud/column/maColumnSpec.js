@@ -3,7 +3,7 @@ describe('directive: ma-column', function () {
     'use strict';
 
     var directive = require('../../../../ng-admin/Crud/column/maColumn');
-    var Field = require('admin-config/lib/Field/Field');
+    var Field = require('ng-admin-config/src/Field/Field');
     angular.module('testapp_Column', [])
         .directive('maColumn', directive)
         .service('FieldViewConfiguration', () => ({ string: { getReadWidget: () => 'DUMMY' } }))

@@ -3,7 +3,7 @@ describe('directive: ma-field', function () {
     'use strict';
 
     var directive = require('../../../../ng-admin/Crud/field/maField');
-    var Field = require('admin-config/lib/Field/Field');
+    var Field = require('ng-admin-config/src/Field/Field');
     angular.module('testapp_Field', [])
         .filter('translate', () => text => text)
         .directive('maField', directive)

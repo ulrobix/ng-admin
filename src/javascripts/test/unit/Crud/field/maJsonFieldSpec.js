@@ -3,7 +3,7 @@ describe('directive: json-field', function () {
     'use strict';
 
     var directive = require('../../../../ng-admin/Crud/field/maJsonField');
-    var Field = require('admin-config/lib/Field/Field');
+    var Field = require('ng-admin-config/src/Field/Field');
 
     angular.module('testapp_JsonField', []).directive('maJsonField', directive);
 

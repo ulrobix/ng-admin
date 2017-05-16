@@ -3,8 +3,8 @@ describe('directive: ma-menu-bar', function () {
     'use strict';
 
     var directive = require('../../../../../ng-admin/Main/component/directive/maMenuBar'),
-        Menu = require('admin-config/lib/Menu/Menu'),
-        Entity = require('admin-config/lib/Entity/Entity'),
+        Menu = require('ng-admin-config/src/Menu/Menu'),
+        Entity = require('ng-admin-config/src/Entity/Entity'),
         blog = new Entity('blog'),
         other = new Entity('other'),
         post = new Entity('post'),

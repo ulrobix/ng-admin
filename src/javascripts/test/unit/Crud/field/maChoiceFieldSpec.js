@@ -1,7 +1,7 @@
 /*global angular,inject,describe,it,expect,beforeEach*/
 describe('directive: choice-field', function () {
     var directive = require('../../../../ng-admin/Crud/field/maChoiceField');
-    var ChoiceField = require('admin-config/lib/Field/ChoiceField');
+    var ChoiceField = require('ng-admin-config/src/Field/ChoiceField');
 
     angular.module('testapp_ChoiceField', ['ui.select'])
         .filter('translate', () => text => text)

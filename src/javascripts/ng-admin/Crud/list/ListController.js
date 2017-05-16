@@ -1,4 +1,4 @@
-import Entry from 'admin-config/lib/Entry';
+import Entry from 'ng-admin-config/src/Entry';
 
 export default class ListController {
     constructor($scope, $stateParams, $location, $anchorScroll, ReadQueries, progression, view, dataStore, totalItems) {

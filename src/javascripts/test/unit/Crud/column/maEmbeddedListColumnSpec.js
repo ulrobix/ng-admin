@@ -3,8 +3,8 @@ describe('directive: ma-embedded-list-column', function () {
     'use strict';
 
     var directive = require('../../../../ng-admin/Crud/column/maEmbeddedListColumn');
-    var Field = require('admin-config/lib/Field/Field');
-    var EmbeddedListField = require('admin-config/lib/Field/EmbeddedListField');
+    var Field = require('ng-admin-config/src/Field/Field');
+    var EmbeddedListField = require('ng-admin-config/src/Field/EmbeddedListField');
 
     angular.module('testapp_EmbeddedListColumn', [])
         .directive('maEmbeddedListColumn', directive)

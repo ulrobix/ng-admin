@@ -3,7 +3,7 @@ describe('directive: ma-boolean-column', function () {
     'use strict';
 
     var directive = require('../../../../ng-admin/Crud/column/maBooleanColumn');
-    var BooleanField = require('admin-config/lib/Field/BooleanField');
+    var BooleanField = require('ng-admin-config/src/Field/BooleanField');
 
     angular.module('testapp_BooleanColumn', []).directive('maBooleanColumn', directive);
 

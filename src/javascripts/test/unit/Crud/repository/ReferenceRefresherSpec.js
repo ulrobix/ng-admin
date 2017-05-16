@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 var mixins = require('../../../mock/mixins');
-var ReferenceField = require('admin-config/lib/Field/ReferenceField');
-var ReadQueries = require('admin-config/lib/Queries/ReadQueries');
+var ReferenceField = require('ng-admin-config/src/Field/ReferenceField');
+var ReadQueries = require('ng-admin-config/src/Queries/ReadQueries');
 var ReferenceRefresher = require('../../../../ng-admin/Crud/repository/ReferenceRefresher');
 
 describe('ReferenceRefresher', function() {

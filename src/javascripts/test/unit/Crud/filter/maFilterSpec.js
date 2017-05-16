@@ -3,7 +3,7 @@ describe('directive: ma-filter', function () {
     'use strict';
 
     var directive = require('../../../../ng-admin/Crud/filter/maFilter');
-    var Field = require('admin-config/lib/Field/Field');
+    var Field = require('ng-admin-config/src/Field/Field');
     angular.module('testapp_Filter', [])
         .directive('maFilter', directive)
         .service('FieldViewConfiguration', () => ({ string: { getFilterWidget: () => 'DUMMY' } }));

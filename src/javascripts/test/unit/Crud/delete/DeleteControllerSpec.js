@@ -2,7 +2,7 @@ describe('DeleteController', function () {
     'use strict';
 
     var DeleteController = require('../../../../ng-admin/Crud/delete/DeleteController'),
-        Entity = require('admin-config/lib/Entity/Entity'),
+        Entity = require('ng-admin-config/src/Entity/Entity'),
         humane = require('humane-js');
 
     var $scope, $window, $q;

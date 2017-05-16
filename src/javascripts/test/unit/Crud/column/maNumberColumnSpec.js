@@ -3,7 +3,7 @@ describe('directive: ma-number-column', function () {
     'use strict';
 
     var directive = require('../../../../ng-admin/Crud/column/maNumberColumn');
-    var NumberField = require('admin-config/lib/Field/NumberField');
+    var NumberField = require('ng-admin-config/src/Field/NumberField');
 
     angular.module('testapp_NumberColumn', ['ngNumeraljs'])
         .filter('ngNumeraljs', require('../../../../../../node_modules/angular-numeraljs/dist/angular-numeraljs.min.js'))

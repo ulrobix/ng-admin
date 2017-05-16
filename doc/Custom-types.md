@@ -83,7 +83,7 @@ One last thing to understand is that ng-admin uses the field type *name* (e.g. '
 Let's write an `AmountField` to manage not only numbers, but amounts. An amount, in addition to a number, has a currency. Create the following `AmountType.js` class in your project tree:
 
 ```js
-import NumberField from 'admin-config/lib/Field/NumberField';
+import NumberField from 'ng-admin-config/src/Field/NumberField';
 class AmountField extends NumberField {
     constructor(name) {
         super(name);

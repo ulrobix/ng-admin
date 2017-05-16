@@ -4,7 +4,7 @@ require('./vendors');
 require('./ng-admin/Main/MainModule');
 require('./ng-admin/Crud/CrudModule');
 
-import Factory from 'admin-config/lib/Factory';
+import Factory from 'ng-admin-config/src/Factory';
 
 const moduleName = 'ng-admin';
 const factory = angular.module('AdminDescriptionModule', []);

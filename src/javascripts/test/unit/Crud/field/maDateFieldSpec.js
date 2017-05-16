@@ -3,7 +3,7 @@ describe('directive: date-field', function() {
     'use strict';
 
     var dateDirective = require('../../../../ng-admin/Crud/field/maDateField');
-    var DateField = require('admin-config/lib/Field/DateField');
+    var DateField = require('ng-admin-config/src/Field/DateField');
 
     angular.module('testapp_DateField', ['ui.bootstrap', 'ui.bootstrap.tpls'])
         .filter('translate', () => text => text)
