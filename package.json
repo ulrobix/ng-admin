@@ -6,7 +6,7 @@
   "main": "lib/javascripts/ng-admin.js",
   "repository": {
     "type": "git",
-    "url": "ssh://git@codebase.drivecred.com:7999/hbk/ng-admin.git"
+    "url": "git+ssh://git@codebase.drivecred.com:7999/hbk/ng-admin.git"
   },
   "files": [
     "*.md",
@@ -15,7 +15,7 @@
     "src/"
   ],
   "dependencies": {
-    "ng-admin-config": "ssh://git@codebase.drivecred.com:7999/hbk/ng-admin-config.git#v2.12.3",
+    "ng-admin-config": "git+ssh://git@codebase.drivecred.com:7999/hbk/ng-admin-config.git#v2.12.3",
     "angular": "~1.6.1",
     "angular-numeraljs": "^1.1.6",
     "angular-sanitize": "^1.3.15",
