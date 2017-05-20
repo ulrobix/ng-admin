@@ -23,10 +23,33 @@ export default class FormController {
         // in case of entity identifier being modified
         this.originEntityId = this.$scope.entry.values[this.entity.identifier().name()];
 
+        this.condition = function(field) {
+            var fn = field.condition && field.condition();
+            if (fn) {
+                var value = this.$scope.entry.values[field.name()];
+                var entry = this.$scope.entry;
+                var entity = this.entity;
+
+                return $injector.invoke(
+                    fn,
+                    view,
+                    { value, entry, entity, view, controller: this, form: this.form }
+                );
+            } else {
+                return true;
+            }
+        }
+
         $scope.$on('$destroy', this.destroy.bind(this));
     }
 
     validateEntry() {
+        angular.forEach(this.form.$error, function(errorFields) {
+            angular.forEach(errorFields, function(field) {
+                field.$setDirty();
+            });
+        });
+
         if (!this.form.$valid) {
             this.$translate('INVALID_FORM').then(text => this.notification.log(text, { addnCls: 'humane-flatty-error' }));
             return false;
@@ -35,7 +58,7 @@ export default class FormController {
         try {
             this.view.validate(this.$scope.entry);
         } catch (error) {
-            this.notification.log(error, { addnCls: 'humane-flatty-error' });
+            this.notification.log(error.message, { addnCls: 'humane-flatty-error' });
             return false;
         }
 

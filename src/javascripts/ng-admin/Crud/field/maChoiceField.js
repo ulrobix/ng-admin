@@ -32,9 +32,11 @@ export default function maChoiceField($compile) {
                     var refreshAttributes = '';
                     var itemsFilter = '| filter: {label: $select.search}';
                     if (field.type().indexOf('reference') === 0 && field.remoteComplete()) { // FIXME wrong place to do that
-                        scope.refreshDelay = field.remoteCompleteOptions().refreshDelay;
-                        refreshAttributes = 'refresh-delay="refreshDelay" refresh="refresh({ $search: $select.search })"';
-                        itemsFilter = '';
+                        if (!field.remoteCompleteOptions().localSearch) {
+                            scope.refreshDelay = field.remoteCompleteOptions().refreshDelay;
+                            refreshAttributes = 'refresh-delay="refreshDelay" refresh="refresh({ $search: $select.search })"';
+                            itemsFilter = '';
+                        }
                     }
 
                     const choices = scope.choices ? scope.choices : field.choices ? field.choices() : [];

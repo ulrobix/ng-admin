@@ -185,6 +185,12 @@ ma-view-actions {
     }
 }
 
+.ng-admin-grid-actions {
+    padding:4px;
+    border-bottom:2px solid #ddd;
+    background: #f9f9f9;
+}
+
 div.bottom-loader {
     margin-top: 40px;
     position: inherit;

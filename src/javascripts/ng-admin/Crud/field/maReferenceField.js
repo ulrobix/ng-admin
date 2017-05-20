@@ -3,7 +3,7 @@ export default function maReferenceField(ReferenceRefresher) {
         scope: {
             'field': '&',
             'value': '=',
-            'entry':  '=?',
+            'entry':  '=',
             'datastore': '&?'
         },
         restrict: 'E',
@@ -32,20 +32,20 @@ export default function maReferenceField(ReferenceRefresher) {
                 }));
                 scope.$broadcast('choices:update', { choices: initialChoices });
             } else {
+                let lastSearch;
+                let filters = field.filters();
+
                 // ui-select doesn't allow to prepopulate autocomplete selects, see https://github.com/angular-ui/ui-select/issues/1197
                 // let ui-select fetch the options using the ReferenceRefresher
                 scope.refresh = function refresh(search) {
-                    return ReferenceRefresher.refresh(field, scope.value, search)
-                        .then(function addCurrentChoice(results) {
+                    lastSearch = search;
+                    return ReferenceRefresher.refresh(field, scope.value, search, filters)
+                        .then(function clearCurrentChoice(results) {
                             if (!search && scope.value) {
                                 const isCurrentValueInEntries = results.filter(e => e.value === scope.value).length > 0;
                                 if (!isCurrentValueInEntries) {
-                                    const currentEntry = scope.datastore()
-                                        .getEntries(field.targetEntity().uniqueId + '_values')
-                                        .find(entry => entry.values[identifierName] == scope.value);
-                                    results.unshift({
-                                        value: currentEntry.values[identifierName],
-                                        label: currentEntry.values[field.targetField().name()]
+                                    scope.$apply(function() {
+                                        scope.value = null;
                                     });
                                 }
                             }
@@ -55,6 +55,23 @@ export default function maReferenceField(ReferenceRefresher) {
                             scope.$broadcast('choices:update', { choices: formattedResults });
                         });
                 };
+
+                if (typeof filters === 'function') {
+                    let filtersFn = filters;
+                    scope.$watch(
+                        function() {
+                            return filtersFn(scope.entry);
+                        },
+                        function(newValue, oldValue) {
+                            filters = newValue;
+                            scope.refresh(lastSearch);
+                        },
+                        true
+                    );
+                } else {
+                    scope.refresh(lastSearch);
+                }
+
             }
         },
         template: `<ma-choice-field

@@ -1,11 +1,13 @@
 export default class DeleteController {
-    constructor($scope, $window, $state, $q, $translate, WriteQueries, Configuration, progression, notification, params, view, entry) {
+    constructor($scope, $window, $state, $injector, $q, $translate, previousState, WriteQueries, NgAdminConfiguration, progression, notification, params, view, entry) { 'ngInject';
         this.$scope = $scope;
         this.$window = $window;
         this.$state = $state;
         this.$translate = $translate;
+        this.$injector = $injector;
+        this.previousState = previousState;
         this.WriteQueries = WriteQueries;
-        this.config = Configuration();
+        this.config = NgAdminConfiguration();
         this.entityLabel = params.entity;
         this.entityId = params.id;
         this.view = view;
@@ -26,20 +28,34 @@ export default class DeleteController {
         });
     }
 
-    deleteOne() {
+    deleteOne($event) {
         const entityName = this.entity.name();
-        const { $translate, notification, progression } = this;
+        const { entity, view, $state, progression, notification, $translate } = this;
         progression.start();
-        return this.WriteQueries.deleteOne(this.view, this.entityId)
-            .then(() => this.previousStateParametersDeferred.promise)
-            .then(previousStateParameters => {
-                // if previous page was related to deleted entity, redirect to list
-                if (previousStateParameters.entity === entityName && previousStateParameters.id === this.entityId) {
-                    return this.$state.go(this.$state.get('list'), angular.extend({
-                        entity: entityName
-                    }, this.$state.params));
+        return this.WriteQueries.deleteOne(view, this.entityId)
+            .then(() => {
+                if (view.onSubmitSuccess()) {
+                    return this.$injector.invoke(
+                        view.onSubmitSuccess(),
+                        view,
+                        { $event, entity: entity, entityId: this.entityId, entry: this.$scope.entry, controller: this, progression, notification });
+                } else {
+                    return true;
                 }
-                return this.back();
+            })
+            .then((onSubmitSuccessResult) => {
+                return onSubmitSuccessResult ? this.previousStateParametersDeferred.promise : false;
+            })
+            .then(previousStateParameters => {
+                if (previousStateParameters) {
+                    // if previous page was related to deleted entity, redirect to list
+                    if (previousStateParameters.entity === entityName && previousStateParameters.id === this.entityId) {
+                        return $state.go($state.get('list'), angular.extend({
+                            entity: entityName
+                        }, this.$state.params));
+                    }
+                    this.back();
+                }
             })
             // no need to call progression.done() in case of success, as it's called by the view dislayed afterwards
             .then(() => $translate('DELETE_SUCCESS'))
@@ -72,5 +88,3 @@ export default class DeleteController {
         this.notification = undefined;
     }
 }
-
-DeleteController.$inject = ['$scope', '$window', '$state', '$q', '$translate', 'WriteQueries', 'NgAdminConfiguration', 'progression', 'notification', 'params', 'view', 'entry'];

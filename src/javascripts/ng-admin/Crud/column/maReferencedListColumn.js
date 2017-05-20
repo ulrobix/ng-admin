@@ -7,15 +7,20 @@ export default function maReferencedListColumn(NgAdminConfiguration, $stateParam
     return {
         scope: {
             'field': '&',
+            'entry': '&',
+            'entity': '&',
             'datastore': '&'
         },
         restrict: 'E',
         link: {
             pre: function(scope) {
                 scope.field = scope.field();
+                scope.entry = scope.entry();
+                scope.entity = scope.entity();
                 var targetEntity = scope.field.targetEntity();
-                scope.entries = scope.datastore().getEntries(targetEntity.uniqueId + '_list');
-                scope.entity = NgAdminConfiguration().getEntity(targetEntity.name());
+                scope.targetEntries = scope.datastore().getEntries(targetEntity.uniqueId + '_list');
+                scope.targetEntity = NgAdminConfiguration().getEntity(targetEntity.name());
+                scope.shouldDisplayDatagridActions = scope.field.actions() && scope.field.actions().length > 0;
                 scope.sortField = isSortFieldForMe($stateParams.sortField, scope.field) ?
                     $stateParams.sortField :
                     scope.field.getSortFieldName();
@@ -23,11 +28,14 @@ export default function maReferencedListColumn(NgAdminConfiguration, $stateParam
             }
         },
         template: `
-<ma-datagrid ng-if="::entries.length > 0" name="{{ field.datagridName() }}"
-    entries="::entries"
+<div ng-if="shouldDisplayDatagridActions" class="ng-admin-grid-actions clearfix">
+    <ma-referenced-list-column-actions field="::field" entry="::entry" target-entries="::targetEntries" entity="::entity" buttons="field.actions()" class="pull-right"></ma-referenced-list-column-actionslist-actions>
+</div>
+<ma-datagrid ng-if="::targetEntries.length > 0" name="{{ field.datagridName() }}"
+    entries="::targetEntries"
     fields="::field.targetFields()"
     list-actions="::field.listActions()"
-    entity="::entity"
+    entity="::targetEntity"
     sort-field="::sortField"
     sort-dir="::sortDir"
     datastore="::datastore()"

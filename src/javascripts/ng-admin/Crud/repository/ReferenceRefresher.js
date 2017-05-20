@@ -5,11 +5,11 @@ export default class ReferenceRefresher {
         this.ReadQueries = ReadQueries;
     }
 
-    refresh(field, currentValue, search) {
+    refresh(field, currentValue, search, filters) {
         var referenceFields = {};
         referenceFields[field.name()] = field;
 
-        var promise = this.ReadQueries.getAllReferencedData(referenceFields, search)
+        var promise = this.ReadQueries.getAllReferencedData(referenceFields, search, filters)
             .then(r => r[field.name()])
             .then(results => this._transformRecords(field, results));
 
