@@ -24,7 +24,7 @@ export default class FormController {
         this.originEntityId = this.$scope.entry.values[this.entity.identifier().name()];
 
         this.condition = function(field) {
-            var fn = field.condition && field.condition();
+            var fn = field.condition();
             if (fn) {
                 var value = this.$scope.entry.values[field.name()];
                 var entry = this.$scope.entry;

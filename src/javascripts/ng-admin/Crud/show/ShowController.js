@@ -1,5 +1,5 @@
 export default class ShowController {
-    constructor($scope, $location, view, dataStore) {
+    constructor($scope, $location, view, dataStore, $injector) {
         this.$scope = $scope;
         this.$location = $location;
         this.title = view.title();
@@ -14,6 +14,23 @@ export default class ShowController {
         this.dataStore = dataStore;
 
         $scope.$on('$destroy', this.destroy.bind(this));
+
+        this.condition = function(field) {
+            var fn = field.condition();
+            if (fn) {
+                var value = this.$scope.entry.values[field.name()];
+                var entry = this.$scope.entry;
+                var entity = this.entity;
+
+                return $injector.invoke(
+                    fn,
+                    view,
+                    { value, entry, entity, view, controller: this }
+                );
+            } else {
+                return true;
+            }
+        }
     }
 
     destroy() {
@@ -25,4 +42,4 @@ export default class ShowController {
     }
 }
 
-ShowController.$inject = ['$scope', '$location', 'view', 'dataStore'];
+ShowController.$inject = ['$scope', '$location', 'view', 'dataStore', '$injector'];

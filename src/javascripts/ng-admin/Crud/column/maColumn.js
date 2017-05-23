@@ -4,10 +4,10 @@ export default function maColumn($state, $anchorScroll, $compile, Configuration,
         if (entity.isReadOnly) {
             return entity.showView().enabled ? 'show' : false;
         }
-        if (field.detailLinkRoute() == 'edit' && entity.editionView().enabled) {
-            return 'edit';
+        if (field.detailLinkRoute() == 'show' && entity.showView().enabled) {
+            return 'show';
         }
-        return entity.showView().enabled ? 'show' : false;
+        return entity.editionView().enabled ? 'edit' : false;
     }
 
     function isDetailLink(field, entity) {
