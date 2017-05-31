@@ -71,7 +71,8 @@ export default class FormController {
             return;
         }
         const { entity, view, $state, progression, notification, $translate } = this;
-        var route = entity.showView().enabled ? 'show' : 'list';
+//        var route = entity.showView().enabled ? 'show' : 'list';
+        var route = 'list';
         var restEntry = this.$scope.entry.transformToRest(view.fields());
         var entry = null;
         progression.start();
