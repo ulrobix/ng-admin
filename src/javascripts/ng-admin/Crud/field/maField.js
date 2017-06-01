@@ -48,29 +48,45 @@ export default function maField(FieldViewConfiguration, $compile) {
                 }
             };
 
-            var fieldTemplate;
-            if (scope.field.editable()) {
-                fieldTemplate =
+            var template;
+
+            if (scope.field.type() == 'section') {
+                template =
+`<div id="row-{{ field.name() }}" class="form-field form-group">
+    <div class="col-sm-12 col-md-10 col-lg-9">
+        <div class="section">
+            <label class="control-label">
+                {{ field.label() | translate }}
+            </label>
+        </div>
+    </div>
+</div>`;
+            } else {
+                var fieldTemplate;
+
+                if (scope.field.editable()) {
+                    fieldTemplate =
 `<div ng-class="getCssClasses(entry)">
     ${(!field.templateIncludesLabel() && field.getTemplateValue(scope.entry)) || FieldViewConfiguration[type].getWriteWidget()}
     <span ng-show="fieldHasValidation()" class="glyphicon form-control-feedback" ng-class="fieldIsValid() ? 'glyphicon-ok' : 'glyphicon-remove'"></span>
 </div>`;
-            } else {
-                fieldTemplate =
+                } else {
+                    fieldTemplate =
 `<div ng-class="field.getCssClasses(entry)||'col-sm-10'">
     <p class="form-control-static">
         <ma-column field="::field" entry="::entry" entity="::entity" datastore="::datastore"></ma-column>
     </p>
 </div>`;
-            }
+                }
 
-            const template =
+                template =
 `<div id="row-{{ field.name() }}" class="form-field form-group has-feedback" ng-class="getFieldValidationClass()">
     <label for="{{ field.name() }}" class="col-sm-2 control-label">
         {{ field.label() | translate }}<span ng-if="field.validation().required">&nbsp;*</span>&nbsp;
     </label>
     ${fieldTemplate}
 </div>`;
+            }
 
             element.append(template);
             $compile(element.contents())(scope);

@@ -21,11 +21,20 @@ export default function maShowItem() {
             }
         },
         template:
-`<div class="col-lg-12 form-group">
-    <label class="col-sm-2 control-label">{{ field.label() | translate }}</label>
-    <div class="show-value" ng-class="(field.getCssClasses(entry) || 'col-sm-10 col-md-8 col-lg-7')">
-        <div ng-class="::'ng-admin-field-' + field.name() + ' ' + 'ng-admin-type-' + field.type()">
-            <ma-column field="::field" entry="::entry" entity="::entity" datastore="::datastore"></ma-column>
+`<div class="form-group">
+    <div ng-if="field.type() == 'section'" class="col-sm-12 col-md-10 col-lg-9">
+        <div class="section">
+            <label class="control-label">
+                {{ field.label() | translate }}
+            </label>
+        </div>
+    </div>
+    <div ng-if="field.type() != 'section'">
+        <label class="col-sm-2 control-label">{{ field.label() | translate }}</label>
+        <div class="show-value" ng-class="(field.getCssClasses(entry) || 'col-sm-10 col-md-8 col-lg-7')">
+            <div ng-class="::'ng-admin-field-' + field.name() + ' ' + 'ng-admin-type-' + field.type()">
+                <ma-column field="::field" entry="::entry" entity="::entity" datastore="::datastore"></ma-column>
+            </div>
         </div>
     </div>
 </div>`
