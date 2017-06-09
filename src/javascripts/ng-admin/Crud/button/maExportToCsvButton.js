@@ -1,4 +1,4 @@
-export default function maExportToCsvButton ($stateParams, Papa, notification, AdminDescription, entryFormatter, ReadQueries) {
+export default function maExportToCsvButton ($stateParams, Papa, notification, AdminDescription, entryFormatter, ReadQueries, $injector, $window) {
     return {
         restrict: 'E',
         scope: {
@@ -25,7 +25,7 @@ export default function maExportToCsvButton ($stateParams, Papa, notification, A
             var formatEntry = entryFormatter.getFormatter(exportView.fields());
 
             scope.exportToCsv = function () {
-                var rawEntries;
+                var rawEntries, entries;
 
                 ReadQueries.getAll(exportView, -1, $stateParams.search, $stateParams.sortField, $stateParams.sortDir)
                     .then(response => {
@@ -45,8 +45,18 @@ export default function maExportToCsvButton ($stateParams, Papa, notification, A
                         }
                     })
                     .then(function () {
-                        var entries = exportView.mapEntries(rawEntries);
+                        entries = exportView.mapEntries(rawEntries);
 
+                        return listView.prepare() && $injector.invoke(listView.prepare(), listView, {
+                                query: $stateParams,
+                                datastore: scope.datastore,
+                                view: listView,
+                                Entry: AdminDescription.getEntryConstructor(),
+                                entries,
+                                window: $window
+                            });
+                    })
+                    .then(function () {
                         // shortcut to diplay collection of entry with included referenced values
                         scope.datastore.fillReferencesValuesFromCollection(entries, exportView.getReferences(), true);
 
@@ -82,4 +92,4 @@ export default function maExportToCsvButton ($stateParams, Papa, notification, A
     };
 }
 
-maExportToCsvButton.$inject = ['$stateParams', 'Papa', 'notification', 'AdminDescription', 'EntryFormatter', 'ReadQueries'];
+maExportToCsvButton.$inject = ['$stateParams', 'Papa', 'notification', 'AdminDescription', 'EntryFormatter', 'ReadQueries', '$injector', '$window'];
