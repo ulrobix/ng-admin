@@ -64,14 +64,19 @@ export default function maExportToCsvButton ($stateParams, Papa, notification, A
                         for (var i = entries.length - 1; i >= 0; i--) {
                             results[i] = formatEntry(entries[i]);
                         }
-                        var csv = Papa.unparse(results, listView.exportOptions());
+                        var options = {
+                            delimiter: ';',
+                        };
+//                        var csv = Papa.unparse(results, listView.exportOptions());
+                        var csv = Papa.unparse(results, options);
+                        csv = "\uFEFF" + csv;
                         var fakeLink = document.createElement('a');
                         document.body.appendChild(fakeLink);
 
                         const blobName = `${scope.entity.name()}.csv`;
 
                         if (window.navigator && window.navigator.msSaveOrOpenBlob) { // Manage IE11+ & Edge
-                            var blob = new Blob([csv], { type: 'text/csv' });
+                            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
                             window.navigator.msSaveOrOpenBlob(blob, blobName);
                         } else {
                             fakeLink.setAttribute('href', 'data:application/octet-stream;charset=utf-8,' + encodeURIComponent(csv));

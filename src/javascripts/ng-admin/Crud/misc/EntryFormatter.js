@@ -1,5 +1,8 @@
 export default class EntryFormatter {
     constructor($filter) {
+        this.formatLabel = function (label) {
+                return $filter('translate')(label);
+        };
         this.formatDate = function (format) {
             return function (date) {
                 return $filter('date')(date, format);
@@ -13,7 +16,7 @@ export default class EntryFormatter {
     }
 
     formatField(field) {
-        var label = field.label() || field.name();
+        var label = field.label() && this.formatLabel(field.label()) || field.name();
         var type = field.type();
         switch (type) {
             case 'boolean':
