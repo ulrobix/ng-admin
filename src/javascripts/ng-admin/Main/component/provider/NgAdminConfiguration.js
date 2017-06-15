@@ -50,8 +50,8 @@ export default class NgAdminConfiguration {
         return this.adminDescription.collection(collection);
     }
 
-    dashboard(dashboard) {
-        return this.adminDescription.dashboard(dashboard);
+    dashboard(name) {
+        return this.adminDescription.dashboard(name);
     }
 }
 
