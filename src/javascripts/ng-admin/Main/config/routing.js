@@ -138,39 +138,39 @@ function routing($stateProvider, $urlRouterProvider) {
                     throw error404;
                 }
             }],
-            collections: ['dashboard', function(dashboard) {
-                return dashboard.collections();
+            widgets: ['dashboard', function(dashboard) {
+                return dashboard.widgets;
             }],
-            responses: ['$stateParams', '$q', 'collections', 'dataStore', 'Entry', 'ReadQueries', function($stateParams, $q, collections, dataStore, Entry, ReadQueries) {
+            responses: ['$stateParams', '$q', 'widgets', 'dataStore', 'Entry', 'ReadQueries', function($stateParams, $q, widgets, dataStore, Entry, ReadQueries) {
                 var sortField = 'sortField' in $stateParams ? $stateParams.sortField : null;
                 var sortDir = 'sortDir' in $stateParams ? $stateParams.sortDir : null;
 
                 var promises = {},
-                    collection,
-                    collectionSortField,
-                    collectionSortDir,
-                    collectionName;
+                    widget,
+                    widgetSortField,
+                    widgetSortDir,
+                    widgetName;
 
-                for (collectionName in collections) {
-                    collection = collections[collectionName];
-                    collectionSortField = collection.getSortFieldName();
-                    collectionSortDir = collection.sortDir();
-                    if (sortField && sortField.split('.')[0] === collection.name()) {
-                        collectionSortField = sortField;
-                        collectionSortDir = sortDir;
+                for (widgetName in widgets) {
+                    widget = widgets[widgetName];
+                    widgetSortField = widget.getSortFieldName();
+                    widgetSortDir = widget.sortDir();
+                    if (sortField && sortField.split('.')[0] === widget.name()) {
+                        widgetSortField = sortField;
+                        widgetSortDir = sortDir;
                     }
-                    promises[collectionName] = (function (collection, collectionSortField, collectionSortDir) {
+                    promises[widgetName] = (function (widget, widgetSortField, widgetSortDir) {
                         var rawEntries;
 
                         return ReadQueries
-                            .getAll(collection, 1, {}, collectionSortField, collectionSortDir)
+                            .getAll(widget, 1, {}, widgetSortField, widgetSortDir)
                             .then(response => {
                                 rawEntries = response.data;
                                 return rawEntries;
                             })
-                            .then(rawEntries => ReadQueries.getReferenceData(collection.fields(), rawEntries))
+                            .then(rawEntries => ReadQueries.getReferenceData(widget.fields(), rawEntries))
                             .then(referenceData => {
-                                const references = collection.getReferences();
+                                const references = widget.getReferences();
                                 for (var name in referenceData) {
                                     Entry.createArrayFromRest(
                                         referenceData[name],
@@ -181,24 +181,24 @@ function routing($stateProvider, $urlRouterProvider) {
                                 }
                             })
                             .then(() => {
-                                var entries = collection.mapEntries(rawEntries);
+                                var entries = widget.mapEntries(rawEntries);
 
-                                // shortcut to display collection of entry with included referenced values
-                                dataStore.fillReferencesValuesFromCollection(entries, collection.getReferences(), true);
+                                // shortcut to display widget of entry with included referenced values
+                                dataStore.fillReferencesValuesFromCollection(entries, widget.getReferences(), true);
 
                                 return entries;
                             });
-                    })(collection, collectionSortField, collectionSortDir);
+                    })(widget, widgetSortField, widgetSortDir);
                 }
 
                 return $q.all(promises);
             }],
-            entries: ['responses', 'collections', function(responses, collections) {
-                var collectionName,
+            entries: ['responses', 'widgets', function(responses, widgets) {
+                var widgetName,
                     entries = {};
 
-                for (collectionName in responses) {
-                    entries[collections[collectionName].name()] = responses[collectionName];
+                for (widgetName in responses) {
+                    entries[widgets[widgetName].name()] = responses[widgetName];
                 }
 
                 return entries;

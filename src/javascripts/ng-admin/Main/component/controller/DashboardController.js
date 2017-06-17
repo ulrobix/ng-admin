@@ -5,9 +5,9 @@
  * @constructor
  */
 export default class DashboardController {
-    constructor($scope, $state, collections, entries, hasEntities, dataStore) {
+    constructor($scope, $state, widgets, entries, hasEntities, dataStore) {
         this.$state = $state;
-        this.collections = collections;
+        this.widgets = widgets;
         this.entries = entries;
         this.hasEntities = hasEntities;
         this.datastore = dataStore;
@@ -24,4 +24,5 @@ export default class DashboardController {
     }
 }
 
-DashboardController.$inject = ['$scope', '$state', 'collections', 'entries', 'hasEntities', 'dataStore'];
+
+DashboardController.$inject = ['$scope', '$state', 'widgets', 'entries', 'hasEntities', 'dataStore'];

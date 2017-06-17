@@ -25,6 +25,7 @@ CrudModule.controller('DeleteController', require('./delete/DeleteController'));
 CrudModule.controller('BatchDeleteController', require('./delete/BatchDeleteController'));
 
 CrudModule.service('EntryFormatter', require('./misc/EntryFormatter'));
+CrudModule.service('FieldFormatter', require('./misc/FieldFormatter'));
 CrudModule.service('PromisesResolver', require('./misc/PromisesResolver'));
 CrudModule.service('ReadQueries', require('./repository/ReadQueries'));
 CrudModule.service('ReferenceRefresher', require('./repository/ReferenceRefresher'));

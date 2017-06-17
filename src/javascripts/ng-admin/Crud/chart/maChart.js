@@ -4,6 +4,10 @@ export default function maChart() {
     return {
         restrict: 'E',
         scope: {
+            chart: '&',
+            entries: '&',
+            datastore: '&',
+
 /*
             name: '@',
             entries: '=',
@@ -21,7 +25,7 @@ export default function maChart() {
         controllerAs: 'chartController',
         controller: maChartController,
         template:
-`<div class="chart-container" style="position: relative;">
+`<div class="chart-container" style="position: relative;padding:8px">
     <canvas id="chart"></canvas>
 </div>`
     };

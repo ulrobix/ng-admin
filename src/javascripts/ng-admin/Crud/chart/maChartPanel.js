@@ -1,23 +1,23 @@
-export default function maDashboardPanel($state) {
+export default function maChartPanel($state) {
     return {
         restrict: 'E',
         scope: {
-            collection: '&',
+            chart: '&',
             entries: '&',
             datastore: '&'
         },
         link: function(scope) {
             scope.gotoList = function () {
-                $state.go($state.get('list'), { entity: scope.collection().entity.name() });
+                $state.go($state.get('list'), { entity: scope.chart().entity.name() });
             };
         },
         template:
 `<div class="panel-heading">
-    <a href="#">{{ (collection().title() || collection().entity.label()) | translate }}</a>
+    <a href="#">{{ (chart().title() || chart().entity.label()) | translate }}</a>
 </div>
-<ma-chart collection="dashboardController.collections.contract_counts" entries="dashboardController.entries.contract_counts" datastore="dashboardController.datastore"></ma-chart>
+<ma-chart chart="chart()" entries="entries()" datastore="datastore()"></ma-chart>
 `
     };
 }
 
-maDashboardPanel.$inject = ['$state'];
+maChartPanel.$inject = ['$state'];

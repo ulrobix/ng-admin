@@ -46,8 +46,12 @@ export default class NgAdminConfiguration {
         return this.adminDescription.menu(entity);
     }
 
-    collection(collection) {
-        return this.adminDescription.collection(collection);
+    collection(entity) {
+        return this.adminDescription.collection(entity);
+    }
+
+    chart(type, entity) {
+        return this.adminDescription.chart(type, entity);
     }
 
     dashboard(name) {

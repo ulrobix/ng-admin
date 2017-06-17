@@ -1,15 +1,32 @@
 import Chart from 'chart.js';
 
 export default class maChartController {
-    constructor($scope, $element, $location, $stateParams, $anchorScroll) {
+    constructor($scope, $element, FieldFormatter, $location, $stateParams, $anchorScroll) {
         var el = angular.element($element.children()[0]).children()[0];
-        var chart = new Chart(el, {
-            type: 'bar',
+
+        this.$scope = $scope;
+
+        this.chart = $scope.chart = $scope.chart();
+        this.entries = $scope.entries = $scope.entries();
+        this.datastore = $scope.datastore = $scope.datastore();
+
+        this.FieldFormatter = FieldFormatter;
+
+        var labels = this.extractDataset(this.chart.labelField());
+        var data = this.extractDataset(this.chart.dataField());
+
+        this.api = new Chart(el, {
+            type: $scope.chart.chartType,
             data: {
-                labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+                labels: labels,
                 datasets: [{
-                    label: '# of Votes',
-                    data: [12, 19, 3, 5, 2, 3],
+                    label: ['# of Votes', '2'],
+                    data: data,
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                    ],
+/*
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',
                         'rgba(54, 162, 235, 0.2)',
@@ -26,18 +43,11 @@ export default class maChartController {
                         'rgba(153, 102, 255, 1)',
                         'rgba(255, 159, 64, 1)'
                     ],
+*/
                     borderWidth: 1
                 }]
             },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:true
-                        }
-                    }]
-                }
-            }
+            options: $scope.chart.options()
         });
 /*
         $scope.entity = $scope.entity();
@@ -54,6 +64,17 @@ export default class maChartController {
         this.sortDir = $scope.sortDir();
         this.sortCallback = $scope.sort() ? $scope.sort() : this.sort.bind(this);
 */
+    }
+
+    extractDataset(fieldName) {
+        var field = this.chart.getField(fieldName);
+        if (!field) {
+            throw new Error('Field \'' + fieldName + '\' not found');
+        }
+
+        return this.entries.map((entry) => {
+            return this.FieldFormatter.formatField(field, entry);
+        });
     }
 
     /**
@@ -140,4 +161,4 @@ export default class maChartController {
     }
 }
 
-maChartController.$inject = ['$scope', '$element', '$location', '$stateParams', '$anchorScroll'];
+maChartController.$inject = ['$scope', '$element', 'FieldFormatter', '$location', '$stateParams', '$anchorScroll'];
