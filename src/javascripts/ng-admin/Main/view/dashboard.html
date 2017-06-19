@@ -8,12 +8,12 @@
 
 <div class="row dashboard-content">
     <div class="col-lg-6">
-        <div class="panel panel-default" ng-repeat="collection in dashboardController.collections | orderElement" ng-if="$even">
+        <div class="panel panel-default" ng-repeat="collection in dashboardController.widgets | orderElement" ng-if="$even">
             <ma-dashboard-panel collection="collection" entries="dashboardController.entries[collection.name()]" datastore="dashboardController.datastore"></ma-dashboard-panel>
         </div>
     </div>
     <div class="col-lg-6">
-        <div class="panel panel-default" ng-repeat="collection in dashboardController.collections | orderElement" ng-if="$odd">
+        <div class="panel panel-default" ng-repeat="collection in dashboardController.widgets | orderElement" ng-if="$odd">
             <ma-dashboard-panel collection="collection" entries="dashboardController.entries[collection.name()]" datastore="dashboardController.datastore"></ma-dashboard-panel>
         </div>
     </div>

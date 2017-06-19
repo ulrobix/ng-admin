@@ -18,7 +18,7 @@ export default class AppController {
     }
 
     displayHome() {
-        this.$state.go(this.$state.get('dashboard'));
+        this.$state.go(this.$state.get('dashboards'), { name: 'primary' });
     }
 
     destroy() {

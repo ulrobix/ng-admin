@@ -1,6 +1,6 @@
 {
   "name": "ng-admin",
-  "version": "2.0.20",
+  "version": "2.0.21",
   "license": "MIT",
   "private": true,
   "main": "lib/javascripts/ng-admin.js",
@@ -31,7 +31,7 @@
     "humane-js": "^3.2.2",
     "jsonlint": "^1.6.2",
     "lodash.debounce": "4.0.8",
-    "ng-admin-config": "git+https://github.com/ulrobix/ng-admin-config.git#v2.12.10",
+    "ng-admin-config": "git+https://github.com/ulrobix/ng-admin-config.git#v2.12.11",
     "ng-file-upload": "^7.0.12",
     "nginflection": "^1.1.10",
     "node-libs-browser": "^0.5.0",
