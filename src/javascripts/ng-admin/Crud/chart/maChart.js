@@ -7,20 +7,6 @@ export default function maChart() {
             chart: '&',
             entries: '&',
             datastore: '&',
-
-/*
-            name: '@',
-            entries: '=',
-            selection: '=',
-            fields: '&',
-            listActions: '&',
-            entity: '&',
-            entryCssClasses: '&?',
-            datastore: '&',
-            sortField: '&',
-            sortDir: '&',
-            sort: '&'
-*/
         },
         controllerAs: 'chartController',
         controller: maChartController,

@@ -48,6 +48,37 @@ export default class FieldFormatter {
                 return; //ignored
         }
     }
+
+    formatFieldValue(field, value) {
+        var type = field.type();
+        switch (type) {
+            case 'boolean':
+            case 'choice':
+            case 'choices':
+            case 'string':
+            case 'text':
+            case 'wysiwyg':
+            case 'email':
+            case 'json':
+            case 'file':
+                return value;
+            case 'number':
+            case 'float':
+                var formatNumber = this.formatNumber(field.format());
+                return formatNumber(value);
+            case 'date':
+            case 'datetime':
+                var format = field.format();
+                if (!format) {
+                    format = type === 'date' ? 'yyyy-MM-dd' : 'yyyy-MM-dd HH:mm:ss';
+                }
+
+                var formatDate = this.formatDate(format);
+                return formatDate(value);
+            default:
+                throw Error(`Value formatting for '${type}' field type is not supported`);
+        }
+    }
 }
 
 FieldFormatter.$inject = ['$filter'];
