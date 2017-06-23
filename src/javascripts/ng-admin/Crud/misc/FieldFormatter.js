@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 export default class FieldFormatter {
     constructor($filter) {
         this.formatDate = function (format) {
@@ -10,62 +12,32 @@ export default class FieldFormatter {
                 return $filter('numeraljs')(number, format);
             };
         };
-    }
 
-    formatField(field, entry) {
-        var type = field.type();
-        switch (type) {
-            case 'boolean':
-            case 'choice':
-            case 'choices':
-            case 'string':
-            case 'text':
-            case 'wysiwyg':
-            case 'email':
-            case 'json':
-            case 'file':
-                return entry.values[field.name()];
-            case 'template':
-                return field.getTemplateValue(entry);
-            case 'number':
-            case 'float':
-                var formatNumber = this.formatNumber(field.format());
-                return formatNumber(entry.values[field.name()]);
-            case 'date':
-            case 'datetime':
-                var format = field.format();
-                if (!format) {
-                    format = type === 'date' ? 'yyyy-MM-dd' : 'yyyy-MM-dd HH:mm:ss';
-                }
+        this.formatReference = function(choices) {
+            return function (value) {
+                return choices[value];
+            }
+        }
 
-                var formatDate = this.formatDate(format);
-                return formatDate(entry.values[field.name()]);
-            case 'reference':
-                return entry.listValues[field.name()];
-            case 'reference_many':
-                return entry.listValues[field.name()].join(', ');
-            case 'referenced_list':
-                return; //ignored
+        this.formatChoice = function(choices) {
+            return function (value) {
+                return $filter('translate')(choices[value]);
+            }
         }
     }
 
-    formatFieldValue(field, value) {
+    getFormatter(field, datastore) {
         var type = field.type();
         switch (type) {
             case 'boolean':
-            case 'choice':
-            case 'choices':
             case 'string':
             case 'text':
-            case 'wysiwyg':
             case 'email':
-            case 'json':
             case 'file':
-                return value;
+                return (value) => value;
             case 'number':
             case 'float':
-                var formatNumber = this.formatNumber(field.format());
-                return formatNumber(value);
+                return this.formatNumber(field.format());
             case 'date':
             case 'datetime':
                 var format = field.format();
@@ -73,12 +45,23 @@ export default class FieldFormatter {
                     format = type === 'date' ? 'yyyy-MM-dd' : 'yyyy-MM-dd HH:mm:ss';
                 }
 
-                var formatDate = this.formatDate(format);
-                return formatDate(value);
+                return this.formatDate(format);
+            case 'reference':
+            case 'reference_many':
+                let refChoices = datastore.getReferenceChoicesById(field);
+                return this.formatReference(refChoices);
+            case 'choice':
+            case 'choices':
+                let choices = {};
+                angular.forEach(field.choices(), (choice) => {
+                    choices[choice.value] = choice.label;
+                });
+                return this.formatChoice(choices);
             default:
                 throw Error(`Value formatting for '${type}' field type is not supported`);
         }
     }
+
 }
 
 FieldFormatter.$inject = ['$filter'];

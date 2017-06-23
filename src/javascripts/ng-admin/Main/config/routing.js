@@ -1,6 +1,7 @@
 import layoutTemplate from '../view/layout.html';
 import dashboardTemplate from '../view/dashboard.html';
 import errorTemplate from '../view/404.html';
+import Entry  from 'ng-admin-config/src/Entry';
 
 function dataStoreProvider() {
     return ['AdminDescription', function (AdminDescription) {
@@ -116,7 +117,18 @@ function routing($stateProvider, $urlRouterProvider) {
                 }
 
                 return entries;
-            }]
+            }],
+            prepare: ['dashboard', '$stateParams', 'dataStore', 'entries', 'widgets', '$window', '$injector', function(dashboard, $stateParams, dataStore, entries, widgets, $window, $injector) {
+                return dashboard.prepare() && $injector.invoke(dashboard.prepare(), dashboard, {
+                        query: $stateParams,
+                        datastore: dataStore,
+                        dashboard,
+                        Entry,
+                        entries,
+                        widgets,
+                        window: $window
+                    });
+            }],
         },
         templateProvider: ['dashboard', function(dashboard) {
             return dashboard.template() || dashboardTemplate;
