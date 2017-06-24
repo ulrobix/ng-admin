@@ -2,8 +2,10 @@ import angular from 'angular';
 import Chart from 'chart.js';
 import Utils from '../misc/Utils';
 
+Chart.defaults.pie.aspectRatio = 2;
+
 export default class maChartController {
-    constructor($scope, $rootScope, $element, FieldFormatter, $location, $stateParams, $anchorScroll) {
+    constructor($scope, $rootScope, $element, FieldFormatter, FieldComparatorFactory, $filter) {
         var el = angular.element($element.children()[0]).children()[0];
 
         this.$scope = $scope;
@@ -13,9 +15,12 @@ export default class maChartController {
         this.datastore = $scope.datastore = $scope.datastore();
 
         this.FieldFormatter = FieldFormatter;
+        this.FieldComparatorFactory = FieldComparatorFactory;
+        this.$filter = $filter;
 
         this.valueField = this.getField(this.chart.valueField());
         this.valueFieldName = this.valueField.name();
+        this.valueFormatter = this.FieldFormatter.getFormatter(this.valueField, this.datastore);
 
         this.api = new Chart(el, {
             type: $scope.chart.chartType,
@@ -47,24 +52,38 @@ export default class maChartController {
 
         let labelField = this.getField(this.chart.labelField());
         let labelFieldName = labelField.name();
-        let labelComparator = Utils.directedComparator(labelField.comparator(), labelField.reverseOrder());
+        let labelFormatter = this.FieldFormatter.getFormatter(labelField, this.datastore);
+        let labelComparator = this.FieldComparatorFactory.create(labelField, this.datastore);
 
         let datasetField = this.chart.datasetField();
-        let datasetFieldName = null;
-        let datasetComparator = () => 0;
+        let datasetFieldName;
+        let datasetComparator;
+        let datasetFormatter;
         if (datasetField) {
             datasetField = this.getField(datasetField);
             datasetFieldName = datasetField.name();
-            datasetComparator = Utils.directedComparator(datasetField.comparator(), datasetField.reverseOrder());
+            datasetFormatter = this.FieldFormatter.getFormatter(datasetField, this.datastore);
+            datasetComparator = this.FieldComparatorFactory.create(datasetField, this.datastore);
+        } else {
+            datasetFieldName = null;
+            datasetComparator = () => 0;
+            let datasetLabel = this.valueField.label();
+            if (datasetLabel) {
+                datasetLabel = this.$filter('translate')(this.valueField.label());
+            } else {
+                datasetLabel = this.valueField.name();
+            }
+            datasetFormatter = (value) => datasetLabel;
         }
 
         let labels = [];
         let datasets = [];
-        let values = [];
+        let valueTable = [];
+        let entryTable = this.entryTable = [];
 
         angular.forEach(this.entries, (entry) => {
             let label = entry.values[labelFieldName];
-            let dataset = datasetFieldName ? entry.values[datasetFieldName] : 'default';
+            let dataset = datasetFieldName ? entry.values[datasetFieldName] : this.valueField.name();
 
             Utils.addToSet(labels, label, labelComparator);
             Utils.addToSet(datasets, dataset, datasetComparator);
@@ -72,16 +91,18 @@ export default class maChartController {
 
         angular.forEach(this.entries, (entry) => {
             let label = entry.values[labelFieldName];
-            let dataset = datasetFieldName ? entry.values[datasetFieldName] : 'default';
+            let dataset = datasetFieldName ? entry.values[datasetFieldName] : this.valueField.name();
 
             let labelIndex = Utils.binarySearch(labels, label, labelComparator);
             let datasetIndex = Utils.binarySearch(datasets, dataset, datasetComparator);
 
             let value = entry.values[this.valueFieldName];
-            if (!values.hasOwnProperty(datasetIndex)) {
-                values[datasetIndex] = [];
+            if (!valueTable.hasOwnProperty(datasetIndex)) {
+                valueTable[datasetIndex] = [];
+                entryTable[datasetIndex] = [];
             }
-            values[datasetIndex][labelIndex] = value;
+            valueTable[datasetIndex][labelIndex] = value;
+            entryTable[datasetIndex][labelIndex] = entry;
         });
 
         let data = {
@@ -90,23 +111,20 @@ export default class maChartController {
         };
 
         angular.forEach(labels, (label) => {
-            let formattedLabel = this.FieldFormatter.formatFieldValue(labelField, label);
+            let formattedLabel = labelFormatter(label);
             data.labels.push(formattedLabel);
         });
 
         angular.forEach(datasets, (dataset, datasetIndex) => {
-            let formattedDataset = 'default';
-            if (datasetField) {
-                formattedDataset = this.FieldFormatter.formatFieldValue(datasetField, dataset);
-            }
+            let formattedDataset = datasetFormatter(dataset);
             let datasetEl = {
                 label: formattedDataset,
-                data: values[datasetIndex],
+                data: valueTable[datasetIndex],
             };
 
             let backgroundColor = this.chart.backgroundColor();
             if (backgroundColor) {
-                if (angular.isArray(backgroundColor)) {
+                if (datasets.length > 1 && angular.isArray(backgroundColor)) {
                     if (datasetIndex < backgroundColor.length) {
                         datasetEl.backgroundColor = backgroundColor[datasetIndex];
                     }
@@ -154,7 +172,7 @@ export default class maChartController {
                             let dataset = chart.datasets[tooltipItem.datasetIndex];
                             let datasetLabel = dataset.label;
                             let value = dataset.data[tooltipItem.index];
-                            let formattedValue = self.FieldFormatter.formatFieldValue(self.valueField, value);
+                            let formattedValue = self.valueFormatter(value);
                             return datasetLabel + ': ' + formattedValue;
                         }
                     }
@@ -165,4 +183,4 @@ export default class maChartController {
     }
 }
 
-maChartController.$inject = ['$scope', '$rootScope', '$element', 'FieldFormatter', '$location', '$stateParams', '$anchorScroll'];
+maChartController.$inject = ['$scope', '$rootScope', '$element', 'FieldFormatter', 'FieldComparatorFactory', '$filter'];

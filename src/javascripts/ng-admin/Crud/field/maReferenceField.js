@@ -44,9 +44,23 @@ export default function maReferenceField(ReferenceRefresher) {
                             if (!search && scope.value) {
                                 const isCurrentValueInEntries = results.filter(e => e.value === scope.value).length > 0;
                                 if (!isCurrentValueInEntries) {
+                                    const currentEntry = scope.datastore()
+                                        .getEntries(field.targetEntity().uniqueId + '_values')
+                                        .find(entry => entry.values[identifierName] == scope.value);
+
+                                    if (currentEntry) {
+                                        results.unshift({
+                                            value: currentEntry.values[identifierName],
+                                            label: currentEntry.values[field.targetField().name()]
+                                        });
+                                    }
+
+
+/*
                                     scope.$apply(function() {
                                         scope.value = null;
                                     });
+*/
                                 }
                             }
                             return results;
