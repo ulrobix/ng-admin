@@ -120,6 +120,7 @@ export default class maChartController {
             let datasetEl = {
                 label: formattedDataset,
                 data: valueTable[datasetIndex],
+                entries: entryTable[datasetIndex],
             };
 
             let backgroundColor = this.chart.backgroundColor();
@@ -135,7 +136,7 @@ export default class maChartController {
 
             let borderColor = this.chart.borderColor();
             if (borderColor) {
-                if (angular.isArray(borderColor)) {
+                if (datasets.length > 1 && angular.isArray(backgroundColor)) {
                     if (datasetIndex < borderColor.length) {
                         datasetEl.borderColor = borderColor[datasetIndex];
                     }
@@ -152,6 +153,7 @@ export default class maChartController {
             angular.forEach(labels, (label, labelIndex) => {
                 if (!datasetEl.data.hasOwnProperty(labelIndex)) {
                     datasetEl.data[labelIndex] = 0;
+                    datasetEl.entries[labelIndex] = null;
                 }
             });
 
