@@ -18,8 +18,6 @@ export default class maChartController {
         this.FieldComparatorFactory = FieldComparatorFactory;
         this.$filter = $filter;
 
-        this.initializeFieldParameters();
-
         this.api = new Chart(el, {
             type: $scope.chart.chartType,
             options: this.buildOptions()
@@ -28,13 +26,14 @@ export default class maChartController {
         var self = this;
 
         function update() {
+            self.initializeFieldParameters();
             self.api.data = self.buildData();
             self.api.update();
         };
 
-        $rootScope.$on('$translateChangeSuccess', update);
-
         update();
+
+        $rootScope.$on('$translateChangeSuccess', update);
     }
 
     getFieldLabel(field) {
