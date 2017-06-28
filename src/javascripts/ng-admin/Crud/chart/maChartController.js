@@ -18,10 +18,6 @@ export default class maChartController {
         this.FieldComparatorFactory = FieldComparatorFactory;
         this.$filter = $filter;
 
-        this.valueField = this.getField(this.chart.valueField());
-        this.valueFieldName = this.valueField.name();
-        this.valueFormatter = this.FieldFormatter.getFormatter(this.valueField, this.datastore);
-
         this.api = new Chart(el, {
             type: $scope.chart.chartType,
             options: this.buildOptions()
@@ -30,13 +26,47 @@ export default class maChartController {
         var self = this;
 
         function update() {
+            self.initializeFieldParameters();
             self.api.data = self.buildData();
             self.api.update();
         };
 
-        $rootScope.$on('$translateChangeSuccess', update);
-
         update();
+
+        $rootScope.$on('$translateChangeSuccess', update);
+    }
+
+    getFieldLabel(field) {
+        let label = field.label();
+        return label ? this.$filter('translate')(label) : field.name();
+    }
+
+    initializeFieldParameters() {
+        this.labelField = this.getField(this.chart.labelField());
+        this.labelFieldName = this.labelField.name();
+        this.labelFormatter = this.FieldFormatter.getFormatter(this.labelField, this.datastore);
+        this.labelComparator = this.FieldComparatorFactory.create(this.labelField, this.datastore);
+        this.labelFieldLabel = this.getFieldLabel(this.labelField);
+
+        this.valueField = this.getField(this.chart.valueField());
+        this.valueFieldName = this.valueField.name();
+        this.valueFormatter = this.FieldFormatter.getFormatter(this.valueField, this.datastore);
+        this.valueFieldLabel = this.getFieldLabel(this.valueField);
+
+        this.datasetField = this.chart.datasetField();
+        if (this.datasetField) {
+            this.datasetField = this.getField(this.datasetField);
+            this.datasetFieldName = this.datasetField.name();
+            this.datasetFormatter = this.FieldFormatter.getFormatter(this.datasetField, this.datastore);
+            this.datasetComparator = this.FieldComparatorFactory.create(this.datasetField, this.datastore);
+            this.datasetFieldLabel = this.getFieldLabel(this.datasetField);
+        } else {
+            this.datasetFieldName = null;
+            this.datasetComparator = () => 0;
+            this.datasetFormatter = (value) => this.datasetLabel;
+            this.datasetLabel = this.valueFieldLabel;
+        }
+
     }
 
     getField(fieldName) {
@@ -50,51 +80,25 @@ export default class maChartController {
     buildData() {
         let self = this;
 
-        let labelField = this.getField(this.chart.labelField());
-        let labelFieldName = labelField.name();
-        let labelFormatter = this.FieldFormatter.getFormatter(labelField, this.datastore);
-        let labelComparator = this.FieldComparatorFactory.create(labelField, this.datastore);
-
-        let datasetField = this.chart.datasetField();
-        let datasetFieldName;
-        let datasetComparator;
-        let datasetFormatter;
-        if (datasetField) {
-            datasetField = this.getField(datasetField);
-            datasetFieldName = datasetField.name();
-            datasetFormatter = this.FieldFormatter.getFormatter(datasetField, this.datastore);
-            datasetComparator = this.FieldComparatorFactory.create(datasetField, this.datastore);
-        } else {
-            datasetFieldName = null;
-            datasetComparator = () => 0;
-            let datasetLabel = this.valueField.label();
-            if (datasetLabel) {
-                datasetLabel = this.$filter('translate')(this.valueField.label());
-            } else {
-                datasetLabel = this.valueField.name();
-            }
-            datasetFormatter = (value) => datasetLabel;
-        }
-
         let labels = [];
         let datasets = [];
         let valueTable = [];
         let entryTable = this.entryTable = [];
 
         angular.forEach(this.entries, (entry) => {
-            let label = entry.values[labelFieldName];
-            let dataset = datasetFieldName ? entry.values[datasetFieldName] : this.valueField.name();
+            let label = entry.values[this.labelFieldName];
+            let dataset = this.datasetFieldName ? entry.values[this.datasetFieldName] : this.valueField.name();
 
-            Utils.addToSet(labels, label, labelComparator);
-            Utils.addToSet(datasets, dataset, datasetComparator);
+            Utils.addToSet(labels, label, this.labelComparator);
+            Utils.addToSet(datasets, dataset, this.datasetComparator);
         });
 
         angular.forEach(this.entries, (entry) => {
-            let label = entry.values[labelFieldName];
-            let dataset = datasetFieldName ? entry.values[datasetFieldName] : this.valueField.name();
+            let label = entry.values[this.labelFieldName];
+            let dataset = this.datasetFieldName ? entry.values[this.datasetFieldName] : this.valueField.name();
 
-            let labelIndex = Utils.binarySearch(labels, label, labelComparator);
-            let datasetIndex = Utils.binarySearch(datasets, dataset, datasetComparator);
+            let labelIndex = Utils.binarySearch(labels, label, this.labelComparator);
+            let datasetIndex = Utils.binarySearch(datasets, dataset, this.datasetComparator);
 
             let value = entry.values[this.valueFieldName];
             if (!valueTable.hasOwnProperty(datasetIndex)) {
@@ -111,15 +115,16 @@ export default class maChartController {
         };
 
         angular.forEach(labels, (label) => {
-            let formattedLabel = labelFormatter(label);
+            let formattedLabel = this.labelFormatter(label);
             data.labels.push(formattedLabel);
         });
 
         angular.forEach(datasets, (dataset, datasetIndex) => {
-            let formattedDataset = datasetFormatter(dataset);
+            let formattedDataset = this.datasetFormatter(dataset);
             let datasetEl = {
                 label: formattedDataset,
                 data: valueTable[datasetIndex],
+                entries: entryTable[datasetIndex],
             };
 
             let backgroundColor = this.chart.backgroundColor();
@@ -135,7 +140,7 @@ export default class maChartController {
 
             let borderColor = this.chart.borderColor();
             if (borderColor) {
-                if (angular.isArray(borderColor)) {
+                if (datasets.length > 1 && angular.isArray(backgroundColor)) {
                     if (datasetIndex < borderColor.length) {
                         datasetEl.borderColor = borderColor[datasetIndex];
                     }
@@ -152,6 +157,7 @@ export default class maChartController {
             angular.forEach(labels, (label, labelIndex) => {
                 if (!datasetEl.data.hasOwnProperty(labelIndex)) {
                     datasetEl.data[labelIndex] = 0;
+                    datasetEl.entries[labelIndex] = null;
                 }
             });
 
@@ -165,22 +171,93 @@ export default class maChartController {
         let self = this;
         return angular.extend(
             {},
-            {
-                tooltips: {
-                    callbacks: {
-                        label: function (tooltipItem, chart) {
-                            let dataset = chart.datasets[tooltipItem.datasetIndex];
-                            let datasetLabel = dataset.label;
-                            let value = dataset.data[tooltipItem.index];
-                            let formattedValue = self.valueFormatter(value);
-                            return datasetLabel + ': ' + formattedValue;
-                        }
-                    }
-                }
-            },
             this.chart.options(),
+            this.buildTooltips()
         );
     }
+
+    buildTooltips() {
+        let self = this;
+        let callback = this.chart.tooltip();
+        let tooltip = {};
+        return {
+            tooltips: {
+                callbacks: {
+                    beforeTitle: function (tooltipItem, chart) {
+                        tooltipItem = tooltipItem[0];
+                        let dataset = chart.datasets[tooltipItem.datasetIndex];
+                        let entry = dataset.entries[tooltipItem.index];
+                        tooltip = self.getDefaultTooltip(self, tooltipItem, chart);
+                        if (callback) {
+                            callback(entry, tooltip, self, tooltipItem, chart);
+                            if (!tooltip.title) {
+                                self.assignTooltipTitle(tooltip);
+                            }
+                            if (!tooltip.body) {
+                                self.assignTooltipBody(tooltip);
+                            }
+                        }
+                    },
+                    title: function () {
+                        return tooltip.title;
+                    },
+                    label: function () {
+                        return tooltip.body;
+                    },
+                }
+            }
+        };
+
+    }
+
+    getDefaultTooltip(ctrl, tooltipItem, chartData) {
+        let labelFieldValue = chartData.labels[tooltipItem.index];
+        let dataset = chartData.datasets[tooltipItem.datasetIndex];
+        let datasetFieldValue = dataset.label;
+        let value = dataset.data[tooltipItem.index];
+        let formattedValue = ctrl.valueFormatter(value);
+        let tooltip = {
+            label: { label: ctrl.labelFieldLabel, value: labelFieldValue },
+            dataset: { label: ctrl.datasetFieldLabel, value: datasetFieldValue },
+            value: { label: ctrl.valueFieldLabel, value: formattedValue }
+        };
+        this.assignTooltipTitle(tooltip);
+        this.assignTooltipBody(tooltip);
+
+        return tooltip;
+    }
+
+    assignTooltipTitle(tooltip) {
+        tooltip.title = tooltip.label.label;
+        if (tooltip.title) {
+            tooltip.title += ': ';
+        } else {
+            tooltip.title = '';
+        }
+        tooltip.title += tooltip.label.value;
+        tooltip.title = [ tooltip.title ];
+        if (this.datasetField) {
+            let dataset = tooltip.dataset.label;
+            if (dataset) {
+                dataset += ': ';
+            } else {
+                dataset = '';
+            }
+            dataset += tooltip.dataset.value;
+            tooltip.title.push(dataset);
+        }
+    }
+
+    assignTooltipBody(tooltip) {
+        tooltip.body = tooltip.value.label;
+        if (tooltip.body) {
+            tooltip.body += ': ';
+        } else {
+            tooltip.body = '';
+        }
+        tooltip.body += tooltip.value.value;
+    }
 }
+
 
 maChartController.$inject = ['$scope', '$rootScope', '$element', 'FieldFormatter', 'FieldComparatorFactory', '$filter'];
